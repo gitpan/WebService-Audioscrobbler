@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/WebService/Audioscrobbler.pm
+lib/WebService/Audioscrobbler/Artist.pm
+lib/WebService/Audioscrobbler/Base.pm
+lib/WebService/Audioscrobbler/SimilarArtist.pm
+lib/WebService/Audioscrobbler/Tag.pm
+lib/WebService/Audioscrobbler/Track.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t

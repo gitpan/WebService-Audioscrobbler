@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WebService-Audioscrobbler
+version:      0.01
+version_from: lib/WebService/Audioscrobbler.pm
+installdirs:  site
+requires:
+    CLASS:                         0
+    Class::Accessor::Fast:         0
+    Class::Data::Accessor:         0
+    LWP::Simple:                   0
+    Test::More:                    0
+    UNIVERSAL::require:            0
+    URI:                           0
+    XML::Simple:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17
