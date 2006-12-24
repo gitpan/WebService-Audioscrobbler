@@ -11,7 +11,7 @@ WebService::Audioscrobbler::Artist - An object-oriented interface to the Audiosc
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # url related accessors
 CLASS->mk_classaccessor("base_url_postfix"        => "artist");
@@ -102,12 +102,23 @@ sub new {
         ref $name_or_fields eq 'HASH' ? $name_or_fields : { name => $name_or_fields } 
     );
 
+    unless (defined $self->name) {
+        if (defined $self->{content}) {
+            $self->name($self->{content});
+        }
+        else {
+            die "Can't create artist without a name";
+        }
+    }
+
     return $self;
 }
 
 =head2 C<similar_artists([$filter])>
 
 =head2 C<related_artists([$filter])>
+
+=head2 C<artists([$filter])>
 
 Retrieves similar artists from the Audioscrobbler database. $filter can be used
 to limit artist with a low similarity index (ie. artists which have a similarity
@@ -119,7 +130,7 @@ L<WebService::Audioscrobbler::SimilarArtist> objects by default.
 
 =cut
 
-*related_artists = \&similar_artists;
+*related_artists = *artists = \&similar_artists;
 
 sub similar_artists {
     my $self = shift;

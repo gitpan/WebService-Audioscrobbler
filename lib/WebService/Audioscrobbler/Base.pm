@@ -17,13 +17,14 @@ WebService::Audioscrobbler::Base - An object-oriented interface to the Audioscro
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # url related accessors
 CLASS->mk_classaccessor("base_url"     => WebService::Audioscrobbler->base_url );
 
-# artist class
-CLASS->mk_classaccessor("artist_class" => WebService::Audioscrobbler->artist_class );
+# artists related
+CLASS->mk_classaccessor("artists_postfix" => "topartists.xml");
+CLASS->mk_classaccessor("artists_class"   => WebService::Audioscrobbler->artist_class );
 
 # tracks related
 CLASS->mk_classaccessor("tracks_postfix" => "toptracks.xml");
@@ -85,9 +86,9 @@ sub tracks {
             $info->{name}   = $title;
             
             if (defined $info->{artist}) {
-                $info->{artist} = $self->artist_class->new($info->{artist});
+                $info->{artist} = $self->artists_class->new($info->{artist});
             }
-            elsif ($self->isa($self->artist_class)) {
+            elsif ($self->isa($self->artists_class)) {
                 $info->{artist} = $self;
             }
             else {
@@ -135,6 +136,40 @@ sub tags {
     }
 
     return wantarray ? @tags : \@tags;
+
+}
+
+=head2 C<artists>
+
+Retrieves the artists related to the current resource as available on Audioscrobbler's database.
+
+Returns either a list of artists or a reference to an array of artists when called 
+in list context or scalar context, respectively. The tags are returned as 
+L<WebService::Audioscrobbler::Artist> objects by default.
+
+=cut
+
+sub artists {
+    my $self = shift;
+
+    my $data = $self->fetch_data($self->artists_postfix);
+
+    my @artists;
+
+    if (ref $data->{artist} eq 'HASH') {
+        my $artists = $data->{artist};
+        @artists = map {
+            my $name = $_;
+
+            my $info = $artists->{$name};
+            $info->{name} = $name;
+
+            $self->artists_class->new($info);
+
+        } sort {$artists->{$b}->{count} <=> $artists->{$a}->{count}} keys %$artists;
+    }
+
+    return wantarray ? @artists : \@artists;
 
 }
 

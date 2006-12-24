@@ -11,7 +11,7 @@ WebService::Audioscrobbler::Track - An object-oriented interface to the Audioscr
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # url related accessors
 CLASS->mk_classaccessor("base_url_postfix"  => "track");
@@ -105,6 +105,10 @@ L<WebService::Audioscrobbler::Tag> objects by default.
 
 sub tracks {
     die "Audioscrobbler doesn't provide data regarding tracks which are related to other tracks";
+}
+
+sub artists {
+    die "Audioscrobbler doesn't provide data regarding artists related to specific tracks";
 }
 
 =head2 C<resource_url>

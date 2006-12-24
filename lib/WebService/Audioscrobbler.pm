@@ -16,7 +16,7 @@ WebService::Audioscrobbler - An object-oriented interface to the Audioscrobbler 
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 CLASS->mk_classaccessor("base_url"     => URI->new("http://ws.audioscrobbler.com/1.0/"));
 
@@ -24,11 +24,13 @@ CLASS->mk_classaccessor("base_url"     => URI->new("http://ws.audioscrobbler.com
 CLASS->mk_classaccessor("artist_class" => CLASS . '::Artist');
 CLASS->mk_classaccessor("track_class" => CLASS . '::Track');
 CLASS->mk_classaccessor("tag_class" => CLASS . '::Tag');
+CLASS->mk_classaccessor("user_class" => CLASS . '::User');
 
 # requiring stuff
 CLASS->artist_class->require or die $@;
 CLASS->track_class->require or die $@;
 CLASS->tag_class->require or die $@;
+CLASS->user_class->require or die $@;
 
 =head1 SYNOPSIS
 
@@ -66,17 +68,22 @@ to the Audioscrobbler WebService API (as available on L<http://www.audioscrobble
 
     ...
 
+    my $user = $ws->user('baz');
+
+    my @baz_neighbours = $user->neighbours;
+
 Audioscrobbler is a great service for tracking musical data of various sorts,
 and its integration with the LastFM service (L<http://www.last.fm>) makes it
 work even better. Audioscrobbler provides data regarding similarity between
 artists, artists discography, tracks by musical genre (actually, by tags), 
-top artists / tracks / albums / tags and much more.
+top artists / tracks / albums / tags and how all of that related to your own
+musical taste.
 
 Currently, only of subset of these data feeds are implemented, which can be 
-viewed as the core part of the service: artists, tracks and tags. Since this
-module was developed as part of a automatic playlist building application (still
-in development) these functions were more than enough for its initial purposes
-but a (nearly) full WebServices API is planned. 
+viewed as the core part of the service: artists, tags, tracks and users. Since 
+this module was developed as part of a automatic playlist building application 
+(still in development) these functions were more than enough for its initial 
+purposes but a (nearly) full WebServices API is planned. 
 
 In any case, code or documentation patches are welcome.
 
@@ -139,6 +146,19 @@ remote calls are dispatched - the object is only constructed.
 sub tag {
     my ($self, $tag) = @_;
     return $self->tag_class->new($tag);
+}
+
+=head2 C<user($name)>
+
+Returns an L<WebService::Audioscrobbler::User> object constructed using the given
+C<$name>. Note that this call doesn't actually check if the user exists since no
+remote calls are dispatched - the object is only constructed.
+
+=cut
+
+sub user {
+    my ($self, $user) = @_;
+    return $self->user_class->new($user);
 }
 
 =head1 AUTHOR

@@ -11,7 +11,7 @@ WebService::Audioscrobbler::Tag - An object-oriented interface to the Audioscrob
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # url related accessors
 CLASS->mk_classaccessor("base_url_postfix"  => "tag");
@@ -90,6 +90,16 @@ Retrieves the tags's top tracks as available on Audioscrobbler's database.
 Returns either a list of tracks or a reference to an array of tracks when called 
 in list context or scalar context, respectively. The tracks are returned as 
 L<WebService::Audioscrobbler::Track> objects by default.
+
+=cut
+
+=head2 C<artists>
+
+Retrieves the tag's top artists as available on Audioscrobbler's database.
+
+Returns either a list of artists or a reference to an array of artists when called 
+in list context or scalar context, respectively. The tags are returned as 
+L<WebService::Audioscrobbler::Artist> objects by default.
 
 =cut
 

@@ -4,10 +4,11 @@ This module aims to be a full implementation of a an object-oriented interface
 to the Audioscrobbler WebService API (as available on http://www.audioscrobbler.net/data/webservices/).
 
 Audioscrobbler is a great service for tracking musical data of various sorts,
-and its integration with the LastFM service (http://www.last.fm) makes it
+and its integration with the LastFM service (L<http://www.last.fm>) makes it
 work even better. Audioscrobbler provides data regarding similarity between
 artists, artists discography, tracks by musical genre (actually, by tags), 
-top artists / tracks / albums / tags and much more.
+top artists / tracks / albums / tags and how all of that related to your own
+musical taste.
 
 INSTALLATION
 

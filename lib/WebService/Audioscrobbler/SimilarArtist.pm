@@ -11,7 +11,7 @@ WebService::Audioscrobbler::SimilarArtist - An object-oriented interface to the 
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # object accessors
 CLASS->mk_accessors(qw/match related_to/);
@@ -23,9 +23,9 @@ aditional fields that cover similarity aspects between two artists.
 
     use WebService::Audioscrobbler;
 
-    my $artist = Webservice::Audioscrobbler->artist('Foo');
+    my $artist = WebService::Audiocrobbler->artist('Foo');
 
-    for my $similar ($artist->similar_artist) {
+    for my $similar ($artist->similar_artists) {
         print $similar->name . ": " . $similar->match . "\% similar\n";
     }
 
