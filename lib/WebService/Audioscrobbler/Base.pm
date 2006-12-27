@@ -1,5 +1,5 @@
 package WebService::Audioscrobbler::Base;
-use warnings;
+use warnings FATAL => 'all';
 use strict;
 use CLASS;
 
@@ -17,22 +17,25 @@ WebService::Audioscrobbler::Base - An object-oriented interface to the Audioscro
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # url related accessors
 CLASS->mk_classaccessor("base_url"     => WebService::Audioscrobbler->base_url );
 
 # artists related
-CLASS->mk_classaccessor("artists_postfix" => "topartists.xml");
-CLASS->mk_classaccessor("artists_class"   => WebService::Audioscrobbler->artist_class );
+CLASS->mk_classaccessor("artists_postfix"    => "topartists.xml");
+CLASS->mk_classaccessor("artists_class"      => WebService::Audioscrobbler->artist_class );
+CLASS->mk_classaccessor("artists_sort_field" => "count");
 
 # tracks related
-CLASS->mk_classaccessor("tracks_postfix" => "toptracks.xml");
-CLASS->mk_classaccessor("tracks_class"   => WebService::Audioscrobbler->track_class );
+CLASS->mk_classaccessor("tracks_postfix"    => "toptracks.xml");
+CLASS->mk_classaccessor("tracks_class"      => WebService::Audioscrobbler->track_class );
+CLASS->mk_classaccessor("tracks_sort_field" => "count");
 
 # tags related
-CLASS->mk_classaccessor("tags_postfix" => "toptags.xml");
-CLASS->mk_classaccessor("tags_class"   => WebService::Audioscrobbler->tag_class );
+CLASS->mk_classaccessor("tags_postfix"    => "toptags.xml");
+CLASS->mk_classaccessor("tags_class"      => WebService::Audioscrobbler->tag_class );
+CLASS->mk_classaccessor("tags_sort_field" => "count");
 
 =head1 SYNOPSIS
 
@@ -78,6 +81,7 @@ sub tracks {
 
     if (ref $data->{track} eq 'HASH') {
         my $tracks = $data->{track};
+        my $sort_field = $self->tracks_sort_field;
 
         @tracks = map {
             my $title = $_;
@@ -97,8 +101,7 @@ sub tracks {
 
             $self->tracks_class->new($info);
 
-        } sort {defined $tracks->{$b}->{reach} ? ($tracks->{$b}->{reach} <=> $tracks->{$a}->{reach}) : 
-                defined $tracks->{$b}->{count} ? ($tracks->{$b}->{count} <=> $tracks->{$a}->{count}) : 0} keys %$tracks;
+        } sort {$tracks->{$b}->{$sort_field} <=> $tracks->{$a}->{$sort_field}} keys %$tracks;
     }
 
     return wantarray ? @tracks : \@tracks;
@@ -124,6 +127,7 @@ sub tags {
 
     if (ref $data->{tag} eq 'HASH') {
         my $tags = $data->{tag};
+        my $sort_field = $self->tags_sort_field;
         @tags = map {
             my $name = $_;
 
@@ -132,7 +136,7 @@ sub tags {
 
             $self->tags_class->new($info);
 
-        } sort {$tags->{$b}->{count} <=> $tags->{$a}->{count}} keys %$tags;
+        } sort {$tags->{$b}->{$sort_field} <=> $tags->{$a}->{$sort_field}} keys %$tags;
     }
 
     return wantarray ? @tags : \@tags;
@@ -158,6 +162,7 @@ sub artists {
 
     if (ref $data->{artist} eq 'HASH') {
         my $artists = $data->{artist};
+        my $sort_field = $self->artists_sort_field;
         @artists = map {
             my $name = $_;
 
@@ -166,7 +171,7 @@ sub artists {
 
             $self->artists_class->new($info);
 
-        } sort {$artists->{$b}->{count} <=> $artists->{$a}->{count}} keys %$artists;
+        } sort {$artists->{$b}->{$sort_field} <=> $artists->{$a}->{$sort_field}} keys %$artists;
     }
 
     return wantarray ? @artists : \@artists;
@@ -214,11 +219,11 @@ sub resource_url {
 
 =head1 AUTHOR
 
-Nilson Santos Figueiredo Junior, C<< <nilsonsfj at cpan.org> >>
+Nilson Santos Figueiredo Júnior, C<< <nilsonsfj at cpan.org> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2006 Nilson Santos Figueiredo Junior, all rights reserved.
+Copyright 2006 Nilson Santos Figueiredo Júnior, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -1,5 +1,5 @@
 package WebService::Audioscrobbler::User;
-use warnings;
+use warnings FATAL => 'all';
 use strict;
 use CLASS;
 
@@ -11,7 +11,7 @@ WebService::Audioscrobbler::User - An object-oriented interface to the Audioscro
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # url related accessors
 CLASS->mk_classaccessor("base_url_postfix"   => "user");
@@ -21,8 +21,16 @@ CLASS->mk_classaccessor("base_resource_url"  => URI->new_abs(CLASS->base_url_pos
 CLASS->mk_classaccessor("neighbours_postfix" => "neighbours.xml");
 CLASS->mk_classaccessor("neighbours_class"   => "WebService::Audioscrobbler::SimilarUser");
 
+# friends related accessors
+CLASS->mk_classaccessor("friends_postfix" => "friends.xml");
+CLASS->mk_classaccessor("friends_class"   => CLASS);
+
 # different postfix
 CLASS->tags_postfix('tags.xml');
+
+# change the field used to sort stuff
+CLASS->artists_sort_field('playcount');
+CLASS->tracks_sort_field('playcount');
 
 # requiring stuff
 CLASS->artists_class->require or die($@);
@@ -158,28 +166,74 @@ sub neighbours {
     my $self = shift;
     my $filter = shift || 1;
 
-    my $data = $self->fetch_data($self->neighbours_postfix);
-
-    my @neighbours;
-
-    # check if we've got any neighbours
-    if (ref $data->{user} eq 'ARRAY') {
-
-        shift @{$data->{user}};
-
-        @neighbours = map {
-            my $neighbour = $_;
+    return $self->fetch_users($self->neighbours_postfix, sub {
+        my $users = shift;
+        map {
             $self->neighbours_class->new({
-                map {$_ => $neighbour->{$_}} qw/username match/,
+                name        =>  $_->{username},
+                match       =>  $_->{match},
                 url         => URI->new($_->{url}),
                 picture_url => URI->new($_->{image}),
                 related_to  => $self
             })
-        } grep { $_->{match} >= $filter } @{$data->{user}};
+        } grep { $_->{match} >= $filter } @$users;
+    });
 
+}
+
+=head2 C<friends>
+
+Retrieves the user's friends from the Audioscrobbler / LastFM database. 
+
+Returns either a list of users or a reference to an array of users when called 
+in list context or scalar context, respectively. The users are returned as 
+L<WebService::Audioscrobbler::User> objects by default.
+
+=cut
+
+sub friends {
+    my $self = shift;
+
+    return $self->fetch_users($self->friends_postfix, sub {
+        my $users = shift;
+        map {
+            $self->friends_class->new({
+                name        => $_->{username},
+                url         => URI->new($_->{url}),
+                picture_url => URI->new($_->{image})
+            })
+        } @$users;
+    });
+}
+
+=head2 C<fetch_users($postfix, $callback)>
+
+Internal method used to fetch users. $postfix should be the users data feed
+postfix and $callback should be a function reference which will be called with
+a arrayref of user data as the only parameter and should return user-derived
+objects.
+
+It returns either an arrayref or a list of objects depending on the calling
+context.
+
+=cut
+
+sub fetch_users {
+    my ($self, $postfix, $callback) = @_;
+
+    my $data = $self->fetch_data($postfix);
+
+    my @users;
+
+    # check if we've got any users
+    if (ref $data->{user} eq 'ARRAY') {
+
+        shift @{$data->{user}};
+
+        @users = $callback->($data->{user});
     }
 
-    return wantarray ? @neighbours : \@neighbours;
+    return wantarray ? @users : \@users;
 }
 
 =head2 C<resource_url>
@@ -196,11 +250,11 @@ sub resource_url {
 
 =head1 AUTHOR
 
-Nilson Santos Figueiredo Junior, C<< <nilsonsfj at cpan.org> >>
+Nilson Santos Figueiredo Júnior, C<< <nilsonsfj at cpan.org> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2006 Nilson Santos Figueiredo Junior, all rights reserved.
+Copyright 2006 Nilson Santos Figueiredo Júnior, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

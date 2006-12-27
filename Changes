@@ -1,5 +1,10 @@
 Revision history for WebService-Audioscrobbler
 
+0.03    Wed Dec 27 04:06:24 2006
+        * bugfix: warnings when listing an user's artists
+	* added support for fetching a user's friends
+	* internal refactoring in various places
+
 0.02    Sun Dec 24 02:33:34 2006
         * initial support for fetching user data and neighbours
 	* now it's possible to fetch artists tagged with a given tag

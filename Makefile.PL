@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME                => 'WebService::Audioscrobbler',
-    AUTHOR              => 'Nilson Santos Figueiredo Junior <nilsonsfj@cpan.org>',
+    AUTHOR              => 'Nilson Santos Figueiredo Júnior <nilsonsfj@cpan.org>',
     VERSION_FROM        => 'lib/WebService/Audioscrobbler.pm',
     ABSTRACT_FROM       => 'lib/WebService/Audioscrobbler.pm',
     PL_FILES            => {},

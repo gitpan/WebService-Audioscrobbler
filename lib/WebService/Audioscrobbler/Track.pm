@@ -11,7 +11,7 @@ WebService::Audioscrobbler::Track - An object-oriented interface to the Audioscr
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # url related accessors
 CLASS->mk_classaccessor("base_url_postfix"  => "track");
@@ -125,11 +125,11 @@ sub resource_url {
 
 =head1 AUTHOR
 
-Nilson Santos Figueiredo Junior, C<< <nilsonsfj at cpan.org> >>
+Nilson Santos Figueiredo Júnior, C<< <nilsonsfj at cpan.org> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2006 Nilson Santos Figueiredo Junior, all rights reserved.
+Copyright 2006 Nilson Santos Figueiredo Júnior, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

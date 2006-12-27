@@ -11,7 +11,7 @@ WebService::Audioscrobbler::Artist - An object-oriented interface to the Audiosc
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # url related accessors
 CLASS->mk_classaccessor("base_url_postfix"        => "artist");
@@ -20,6 +20,9 @@ CLASS->mk_classaccessor("base_resource_url"       => URI->new_abs(CLASS->base_ur
 # similar artists related accessors
 CLASS->mk_classaccessor("similar_artists_postfix" => "similar.xml");
 CLASS->mk_classaccessor("similar_artists_class"   => "WebService::Audioscrobbler::SimilarArtist");
+
+# change the field used to sort stuff
+CLASS->tracks_sort_field('reach');
 
 # requiring stuff
 CLASS->similar_artists_class->require or die($@);
@@ -214,11 +217,11 @@ sub resource_url {
 
 =head1 AUTHOR
 
-Nilson Santos Figueiredo Junior, C<< <nilsonsfj at cpan.org> >>
+Nilson Santos Figueiredo Júnior, C<< <nilsonsfj at cpan.org> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2006 Nilson Santos Figueiredo Junior, all rights reserved.
+Copyright 2006 Nilson Santos Figueiredo Júnior, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -11,7 +11,7 @@ WebService::Audioscrobbler::SimilarUser - An object-oriented interface to the Au
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # object accessors
 CLASS->mk_accessors(qw/match related_to/);
@@ -44,11 +44,11 @@ as a number between 0 (not similar) and 100 (very similar).
 
 =head1 AUTHOR
 
-Nilson Santos Figueiredo Junior, C<< <nilsonsfj at cpan.org> >>
+Nilson Santos Figueiredo Júnior, C<< <nilsonsfj at cpan.org> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2006 Nilson Santos Figueiredo Junior, all rights reserved.
+Copyright 2006 Nilson Santos Figueiredo Júnior, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
