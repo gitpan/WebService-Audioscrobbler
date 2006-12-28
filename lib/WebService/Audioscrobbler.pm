@@ -4,6 +4,7 @@ use strict;
 use CLASS;
 
 use base 'Class::Data::Accessor';
+use base 'Class::Accessor::Fast';
 
 use NEXT;
 use UNIVERSAL::require;
@@ -16,26 +17,34 @@ WebService::Audioscrobbler - An object-oriented interface to the Audioscrobbler 
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
-CLASS->mk_classaccessor("base_url"     => URI->new("http://ws.audioscrobbler.com/1.0/"));
+CLASS->mk_classaccessor("base_url" => URI->new("http://ws.audioscrobbler.com/1.0/"));
 
 # defining default classes
-CLASS->mk_classaccessor("artist_class" => CLASS . '::Artist');
-CLASS->mk_classaccessor("track_class" => CLASS . '::Track');
-CLASS->mk_classaccessor("tag_class" => CLASS . '::Tag');
-CLASS->mk_classaccessor("user_class" => CLASS . '::User');
+CLASS->mk_classaccessor("artist_class"       => CLASS . '::Artist');
+CLASS->mk_classaccessor("track_class"        => CLASS . '::Track');
+CLASS->mk_classaccessor("tag_class"          => CLASS . '::Tag');
+CLASS->mk_classaccessor("user_class"         => CLASS . '::User');
+CLASS->mk_classaccessor("data_fetcher_class" => CLASS . '::DataFetcher');
 
 # requiring stuff
-CLASS->artist_class->require or die $@;
-CLASS->track_class->require or die $@;
-CLASS->tag_class->require or die $@;
-CLASS->user_class->require or die $@;
+CLASS->artist_class->require         or die $@;
+CLASS->track_class->require          or die $@;
+CLASS->tag_class->require            or die $@;
+CLASS->user_class->require           or die $@;
+CLASS->data_fetcher_class->require   or die $@;
+
+# object accessors
+CLASS->mk_accessors(qw/data_fetcher/);
 
 =head1 SYNOPSIS
 
 This module aims to be a full implementation of a an object-oriented interface 
-to the Audioscrobbler WebService API (as available on L<http://www.audioscrobbler.net/data/webservices/>).
+to the Audioscrobbler WebService API (as available on 
+L<http://www.audioscrobbler.net/data/webservices/>). As of version 0.04, the 
+module fully supports data caching and, thus, complies to the service's 
+recommended usage guides.
 
     use WebService::Audioscrobbler;
 
@@ -91,38 +100,53 @@ In any case, code or documentation patches are welcome.
 
 =cut
 
-=head2 C<new>
+=head2 C<new([$cache_root]>
 
-Creates a new C<WebService::Audioscrobbler> object. This object can then be used
-to retrieve various bits of information from the Audioscrobbler database.
+Creates a new C<WebService::Audioscrobbler> object. This object can then be 
+used to retrieve various bits of information from the Audioscrobbler database. 
+If C<$cache_root> is specified, Audioscrobbler data will be cached under this 
+directory, otherwise it will use L<Cache::FileCache> defaults.
 
 =cut
 
 sub new {
     my $class = shift;
-    bless {}, $class;
+    my ($cache_root) = @_;
+
+    my $self = bless {}, $class;
+    
+    # creates the data fetcher object which will be extensively used
+    $self->data_fetcher( 
+        $self->data_fetcher_class->new( {
+            base_url    =>  $self->base_url,
+            cache_root  =>  $cache_root
+        } )
+    );
+
+    $self;
 }
 
 =head2 C<artist($name)>
 
-Returns an L<WebService::Audioscrobbler::Artist> object constructed using the given
-C<$name>. Note that this call doesn't actually check if the artist exists since no
-remote calls are dispatched - the object is only constructed.
+Returns an L<WebService::Audioscrobbler::Artist> object constructed using the 
+given C<$name>. Note that this call doesn't actually check if the artist exists
+since no remote calls are dispatched - the object is only constructed.
 
 =cut
 
 sub artist {
     my ($self, $artist) = @_;
-    return $self->artist_class->new($artist);
+    return $self->artist_class->new($artist, $self->data_fetcher);
 }
 
 =head2 C<track($artist, $title)>
 
-Returns an L<WebService::Audioscrobbler::Track> object constructed used the given
-C<$artist> and C<$title>. The C<$artist> parameter can either be a L<WebService::Audioscrobbler::Artist>
-object or a string (in this case, a L<WebService::Audioscrobbler::Artist> will be created
-behind the scenes). Note that this call doesn't actually check if the track exists since no
-remote calls are dispatched - the object is only constructed.
+Returns an L<WebService::Audioscrobbler::Track> object constructed used the 
+given C<$artist> and C<$title>. The C<$artist> parameter can either be a 
+L<WebService::Audioscrobbler::Artist> object or a string (in this case, a 
+L<WebService::Audioscrobbler::Artist> will be created behind the scenes). Note 
+that this call doesn't actually check if the track exists since no remote calls
+are dispatched - the object is only constructed.
 
 =cut
 
@@ -130,9 +154,9 @@ sub track {
     my ($self, $artist, $title) = @_;
 
     $artist = $self->artist($artist) 
-        unless ref $artist; # assume the user knows what he's doing if we got a reference
+        unless ref $artist; # assume the user knows what he's doing
 
-    return $self->track_class->new($artist, $title);
+    return $self->track_class->new($artist, $title, $self->data_fetcher);
 }
 
 =head2 C<tag($name)>
@@ -145,7 +169,7 @@ remote calls are dispatched - the object is only constructed.
 
 sub tag {
     my ($self, $tag) = @_;
-    return $self->tag_class->new($tag);
+    return $self->tag_class->new($tag, $self->data_fetcher);
 }
 
 =head2 C<user($name)>
@@ -158,7 +182,7 @@ remote calls are dispatched - the object is only constructed.
 
 sub user {
     my ($self, $user) = @_;
-    return $self->user_class->new($user);
+    return $self->user_class->new($user, $self->data_fetcher);
 }
 
 =head1 AUTHOR
@@ -221,7 +245,7 @@ more licensing information.
 
 =item * L<WebService::LastFM::SimilarArtists>, L<WebServices::LastFM>, L<Audio::Scrobbler>
 
-=item * L<LWP::Simple>, L<URI>, L<XML::Simple>
+=item * L<LWP::Simple>, L<XML::Simple>, L<Cache::FileCache>, L<URI>
 
 =back
 

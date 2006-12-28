@@ -11,11 +11,10 @@ WebService::Audioscrobbler::User - An object-oriented interface to the Audioscro
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
-# url related accessors
-CLASS->mk_classaccessor("base_url_postfix"   => "user");
-CLASS->mk_classaccessor("base_resource_url"  => URI->new_abs(CLASS->base_url_postfix, CLASS->base_url));
+# postfix related accessors
+CLASS->mk_classaccessor("base_resource_path"   => "user");
 
 # neighbours related accessors
 CLASS->mk_classaccessor("neighbours_postfix" => "neighbours.xml");
@@ -33,9 +32,9 @@ CLASS->artists_sort_field('playcount');
 CLASS->tracks_sort_field('playcount');
 
 # requiring stuff
-CLASS->artists_class->require or die($@);
-CLASS->tracks_class->require or die($@);
-CLASS->tags_class->require or die($@);
+CLASS->artists_class->require    or die($@);
+CLASS->tracks_class->require     or die($@);
+CLASS->tags_class->require       or die($@);
 CLASS->neighbours_class->require or die($@);
 
 # object accessors
@@ -89,31 +88,34 @@ about the user.
 
 =cut
 
-=head2 C<new($user_name)>
+=head2 C<new($user_name, $data_fetcher)>
 
 =head2 C<new(\%fields)>
 
 Creates a new object using either the given C<$user_name> or the C<\%fields> 
-hashref. Usually only used internally, since 
-C<<WebService::Audioscrobbler->user($user_name)>> is provided as an external
-interface.
+hashref. The data fetcher object is a mandatory parameter and must
+be provided either as the second parameter or inside the C<\%fields> hashref. 
 
 =cut
 
 sub new {
     my $class = shift;
-    my ($name_or_fields) = @_;
+    my ($name_or_fields, $data_fetcher) = @_;
 
     my $self = $class->SUPER::new( 
-        ref $name_or_fields eq 'HASH' ? $name_or_fields : { name => $name_or_fields } 
+        ref $name_or_fields eq 'HASH' ? 
+            $name_or_fields : { name => $name_or_fields, data_fetcher => $data_fetcher } 
     );
+
+    $self->croak("No data fetcher provided")
+        unless $self->data_fetcher;
 
     unless (defined $self->name) {
         if (defined $self->{username}) {
             $self->name($self->{username})
         }
         else {
-            die "Can't create user without a name";
+            $self->croak("Can't create user without a name");
         }
     }
 
@@ -170,11 +172,12 @@ sub neighbours {
         my $users = shift;
         map {
             $self->neighbours_class->new({
-                name        =>  $_->{username},
-                match       =>  $_->{match},
-                url         => URI->new($_->{url}),
-                picture_url => URI->new($_->{image}),
-                related_to  => $self
+                name         =>  $_->{username},
+                match        =>  $_->{match},
+                url          => URI->new($_->{url}),
+                picture_url  => URI->new($_->{image}),
+                related_to   => $self,
+                data_fetcher => $self->data_fetcher
             })
         } grep { $_->{match} >= $filter } @$users;
     });
@@ -198,9 +201,10 @@ sub friends {
         my $users = shift;
         map {
             $self->friends_class->new({
-                name        => $_->{username},
-                url         => URI->new($_->{url}),
-                picture_url => URI->new($_->{image})
+                name         => $_->{username},
+                url          => URI->new($_->{url}),
+                picture_url  => URI->new($_->{image}),
+                data_fetcher => $self->data_fetcher
             })
         } @$users;
     });
@@ -236,16 +240,16 @@ sub fetch_users {
     return wantarray ? @users : \@users;
 }
 
-=head2 C<resource_url>
+=head2 C<resource_path>
 
 Returns the URL from which other URLs used for fetching user info will be 
 derived from.
 
 =cut
 
-sub resource_url {
+sub resource_path {
     my $self = shift;
-    URI->new_abs($self->name, $self->base_resource_url . '/');
+    URI->new( join '/', $self->base_resource_path, $self->name );
 }
 
 =head1 AUTHOR

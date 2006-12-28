@@ -11,11 +11,10 @@ WebService::Audioscrobbler::Artist - An object-oriented interface to the Audiosc
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
-# url related accessors
-CLASS->mk_classaccessor("base_url_postfix"        => "artist");
-CLASS->mk_classaccessor("base_resource_url"       => URI->new_abs(CLASS->base_url_postfix, CLASS->base_url));
+# postfix related accessors
+CLASS->mk_classaccessor("base_resource_path"  => "artist");
 
 # similar artists related accessors
 CLASS->mk_classaccessor("similar_artists_postfix" => "similar.xml");
@@ -26,8 +25,8 @@ CLASS->tracks_sort_field('reach');
 
 # requiring stuff
 CLASS->similar_artists_class->require or die($@);
-CLASS->tracks_class->require or die($@);
-CLASS->tags_class->require or die($@);
+CLASS->tracks_class->require          or die($@);
+CLASS->tags_class->require            or die($@);
 
 # object accessors
 CLASS->mk_accessors(qw/name mbid streamable picture_url/);
@@ -86,31 +85,34 @@ Flag indicating whether the artist has streamable content available.
 
 =cut
 
-=head2 C<new($artist_name)>
+=head2 C<new($artist_name, $data_fetcher)>
 
 =head2 C<new(\%fields)>
 
 Creates a new object using either the given C<$artist_name> or the C<\%fields> 
-hashref. Usually only used internally, since 
-C<<WebService::Audioscrobbler->artist($artist_name)>> is provided as an external
-interface.
+hashref. The data fetcher object is a mandatory parameter and must
+be provided either as the second parameter or inside the C<\%fields> hashref. 
 
 =cut
 
 sub new {
     my $class = shift;
-    my ($name_or_fields) = @_;
+    my ($name_or_fields, $data_fetcher) = @_;
 
     my $self = $class->SUPER::new( 
-        ref $name_or_fields eq 'HASH' ? $name_or_fields : { name => $name_or_fields } 
+        ref $name_or_fields eq 'HASH' ? 
+            $name_or_fields : { name => $name_or_fields, data_fetcher => $data_fetcher } 
     );
+
+    $self->croak("No data fetcher provided")
+        unless $self->data_fetcher;
 
     unless (defined $self->name) {
         if (defined $self->{content}) {
             $self->name($self->{content});
         }
         else {
-            die "Can't create artist without a name";
+            $class->croak("Can't create artist without a name");
         }
     }
 
@@ -153,9 +155,10 @@ sub similar_artists {
         @artists = map {
             my $artist = $_;
             $self->similar_artists_class->new({
-                map {$_ => $artist->{$_}} qw/name streamable mbid match/,
-                picture_url => URI->new($_->{image}),
-                related_to  => $self
+                picture_url  => URI->new($_->{image}),
+                related_to   => $self,
+                data_fetcher => $self->data_fetcher,
+                map {$_ => $artist->{$_}} qw/name streamable mbid match/
             })
         } grep { $_->{match} >= $filter } @{$data->{artist}};
 
@@ -203,16 +206,16 @@ sub load_fields {
         unless $self->mbid;
 }
 
-=head2 C<resource_url>
+=head2 C<resource_path>
 
 Returns the URL from which other URLs used for fetching artist info will be 
 derived from.
 
 =cut
 
-sub resource_url {
+sub resource_path {
     my $self = shift;
-    URI->new_abs($self->name, $self->base_resource_url . '/');
+    URI->new( join '/', $self->base_resource_path, $self->name );
 }
 
 =head1 AUTHOR

@@ -1,5 +1,13 @@
 Revision history for WebService-Audioscrobbler
 
+0.04    Thu Dec 28 01:15:15 2006
+        * added caching support!
+	* somewhat major internal refactoring
+	* removed resource_url() method from Base.pm (it was replace by 
+	  the resource_path() method as part of the refactoring)
+	* most of the constructors now require a data fetcher object
+	* some internal interfaces changed
+
 0.03    Wed Dec 27 04:06:24 2006
         * bugfix: warnings when listing an user's artists
 	* added support for fetching a user's friends

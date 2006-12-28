@@ -9,6 +9,8 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/WebService/Audioscrobbler.pm',
     PL_FILES            => {},
     PREREQ_PM => {
+        'Cache::FileCache'      => 0,
+        'Carp'                  => 0,
         'CLASS'                 => 0,
         'Class::Accessor::Fast' => 0,
         'Class::Data::Accessor' => 0,

@@ -11,11 +11,10 @@ WebService::Audioscrobbler::Track - An object-oriented interface to the Audioscr
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
-# url related accessors
-CLASS->mk_classaccessor("base_url_postfix"  => "track");
-CLASS->mk_classaccessor("base_resource_url" => URI->new_abs(CLASS->base_url_postfix, CLASS->base_url));
+# postfix related accessors
+CLASS->mk_classaccessor("base_resource_path"  => "track");
 
 # requiring stuff
 CLASS->tags_class->require or die($@);
@@ -73,22 +72,27 @@ URL for aditional info about the track.
 
 =cut
 
-=head2 C<new($artist, $title)>
+=head2 C<new($artist, $title, $data_fetcher)>
 
 =head2 C<new(\%fields)>
 
 Creates a new object using either the given C<$artist> and C<$title> or the 
-C<\%fields> hashref.
+C<\%fields> hashref. The data fetcher object is a mandatory parameter and must
+be provided either as the second parameter or inside the C<\%fields> hashref.
 
 =cut
 
 sub new {
     my $class = shift;
-    my ($artist_or_fields, $title) = @_;
+    my ($artist_or_fields, $title, $data_fetcher) = @_;
 
     my $self = $class->SUPER::new( 
-        ref $artist_or_fields eq 'HASH' ? $artist_or_fields : { artist => $artist_or_fields, name => $title } 
+        ref $artist_or_fields eq 'HASH' ? 
+            $artist_or_fields : { artist => $artist_or_fields, name => $title, data_fetcher => $data_fetcher } 
     );
+
+    $class->croak("No data fetcher provided")
+        unless $self->data_fetcher;
 
     return $self;
 }
@@ -104,23 +108,23 @@ L<WebService::Audioscrobbler::Tag> objects by default.
 =cut
 
 sub tracks {
-    die "Audioscrobbler doesn't provide data regarding tracks which are related to other tracks";
+    shift->croak("Audioscrobbler doesn't provide data regarding tracks which are related to other tracks");
 }
 
 sub artists {
-    die "Audioscrobbler doesn't provide data regarding artists related to specific tracks";
+    shift->croak("Audioscrobbler doesn't provide data regarding artists related to specific tracks");
 }
 
-=head2 C<resource_url>
+=head2 C<resource_path>
 
 Returns the URL from which other URLs used for fetching track info will be 
 derived from.
 
 =cut
 
-sub resource_url {
+sub resource_path {
     my $self = shift;
-    URI->new_abs($self->artist->name . '/' . $self->name, $self->base_resource_url . '/');
+    URI->new( join '/', $self->base_resource_path, $self->artist->name, $self->name );
 }
 
 =head1 AUTHOR

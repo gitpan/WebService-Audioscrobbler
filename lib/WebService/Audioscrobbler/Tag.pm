@@ -11,11 +11,10 @@ WebService::Audioscrobbler::Tag - An object-oriented interface to the Audioscrob
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
-# url related accessors
-CLASS->mk_classaccessor("base_url_postfix"  => "tag");
-CLASS->mk_classaccessor("base_resource_url" => URI->new_abs(CLASS->base_url_postfix, CLASS->base_url));
+# postfix related accessors
+CLASS->mk_classaccessor("base_resource_path"  => "tag");
 
 # requering stuff
 CLASS->tracks_class->require or die($@);
@@ -63,22 +62,27 @@ URL for aditional info about the tag.
 
 =cut
 
-=head2 C<new($artist, $title)>
+=head2 C<new($name, $data_fetcher)>
 
 =head2 C<new(\%fields)>
 
 Creates a new object using either the given C<$artist> and C<$title> or the 
-C<\%fields> hashref.
+C<\%fields> hashref. The data fetcher object is a mandatory parameter and must
+be provided either as the second parameter or inside the C<\%fields> hashref.
 
 =cut
 
 sub new {
     my $class = shift;
-    my ($name_or_fields) = @_;
+    my ($name_or_fields, $data_fetcher) = @_;
 
     my $self = $class->SUPER::new( 
-        ref $name_or_fields eq 'HASH' ? $name_or_fields : { name => $name_or_fields } 
+        ref $name_or_fields eq 'HASH' ? 
+            $name_or_fields : { name => $name_or_fields, data_fetcher => $data_fetcher } 
     );
+
+    $self->croak("No data fetcher provided")
+        unless $self->data_fetcher;
 
     return $self;
 }
@@ -104,19 +108,19 @@ L<WebService::Audioscrobbler::Artist> objects by default.
 =cut
 
 sub tags {
-    die "Audioscrobbler doesn't provide data regarding tags which are related to other tags";
+    shift->croak("Audioscrobbler doesn't provide data regarding tags which are related to other tags");
 }
 
-=head2 C<resource_url>
+=head2 C<resource_path>
 
 Returns the URL from which other URLs used for fetching tag info will be 
 derived from.
 
 =cut
 
-sub resource_url {
+sub resource_path {
     my $self = shift;
-    URI->new_abs($self->name, $self->base_resource_url . '/');
+    URI->new( join '/', $self->base_resource_path, $self->name );
 }
 
 =head1 AUTHOR

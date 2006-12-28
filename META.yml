@@ -1,10 +1,12 @@
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         WebService-Audioscrobbler
-version:      0.03
+version:      0.04
 version_from: lib/WebService/Audioscrobbler.pm
 installdirs:  site
 requires:
+    Cache::FileCache:              0
+    Carp:                          0
     CLASS:                         0
     Class::Accessor::Fast:         0
     Class::Data::Accessor:         0
