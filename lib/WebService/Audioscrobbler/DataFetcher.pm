@@ -16,7 +16,7 @@ WebService::Audioscrobbler::DataFetcher - Cached data fetching provider
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # object accessors
 CLASS->mk_accessors(qw/base_url cache_root cache/);

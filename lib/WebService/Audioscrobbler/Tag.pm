@@ -11,7 +11,7 @@ WebService::Audioscrobbler::Tag - An object-oriented interface to the Audioscrob
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # postfix related accessors
 CLASS->mk_classaccessor("base_resource_path"  => "tag");
@@ -120,7 +120,7 @@ derived from.
 
 sub resource_path {
     my $self = shift;
-    URI->new( join '/', $self->base_resource_path, $self->name );
+    $self->uri_builder( $self->name );
 }
 
 =head1 AUTHOR

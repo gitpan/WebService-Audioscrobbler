@@ -6,6 +6,9 @@ use CLASS;
 use base 'Class::Data::Accessor';
 use base 'Class::Accessor::Fast';
 
+require URI;
+require URI::Escape;
+
 use WebService::Audioscrobbler;
 
 =head1 NAME
@@ -14,7 +17,7 @@ WebService::Audioscrobbler::Base - An object-oriented interface to the Audioscro
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # artists related
 CLASS->mk_classaccessor("artists_postfix"    => "topartists.xml");
@@ -210,6 +213,19 @@ Audioscrobbler.
 sub resource_path {
     my $class = ref shift;
     croak("$class must override the 'resource_path' method");
+}
+
+=head2 C<uri_builder>
+
+Helps classes which inherit from WebService::Audioscrobbler::Base to build
+URI objects. Mainly used for keeping C<resource_path> code cleaner in those
+classes.
+
+=cut
+
+sub uri_builder {
+    my ($self, @bits) = @_;
+    URI->new( join '/', $self->base_resource_path, map {URI::Escape::uri_escape($_)} @bits );
 }
 
 =head2 C<croak>

@@ -11,7 +11,7 @@ WebService::Audioscrobbler::SimilarArtist - An object-oriented interface to the 
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # object accessors
 CLASS->mk_accessors(qw/match related_to/);

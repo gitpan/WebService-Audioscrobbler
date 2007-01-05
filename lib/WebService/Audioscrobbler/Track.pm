@@ -11,7 +11,7 @@ WebService::Audioscrobbler::Track - An object-oriented interface to the Audioscr
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # postfix related accessors
 CLASS->mk_classaccessor("base_resource_path"  => "track");
@@ -124,7 +124,7 @@ derived from.
 
 sub resource_path {
     my $self = shift;
-    URI->new( join '/', $self->base_resource_path, $self->artist->name, $self->name );
+    $self->uri_builder( $self->artist->name, $self->name );
 }
 
 =head1 AUTHOR

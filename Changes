@@ -1,5 +1,10 @@
 Revision history for WebService-Audioscrobbler
 
+0.05    Fri Jan  5 03:25:03 2007
+        * bugfix: resources which contained slash (/) characters didn't work
+        * uri_builder() method implemented (helps child classes build their
+	  resource_paths easier)
+
 0.04    Thu Dec 28 01:15:15 2006
         * added caching support!
 	* somewhat major internal refactoring

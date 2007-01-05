@@ -1,7 +1,7 @@
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         WebService-Audioscrobbler
-version:      0.04
+version:      0.05
 version_from: lib/WebService/Audioscrobbler.pm
 installdirs:  site
 requires:
@@ -14,6 +14,7 @@ requires:
     Test::More:                    0
     UNIVERSAL::require:            0
     URI:                           0
+    URI::Escape:                   0
     XML::Simple:                   0
 
 distribution_type: module

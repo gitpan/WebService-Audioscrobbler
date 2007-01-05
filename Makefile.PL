@@ -18,6 +18,7 @@ WriteMakefile(
         'Test::More'            => 0,
         'UNIVERSAL::require'    => 0,
         'URI'                   => 0,
+        'URI::Escape'           => 0,
         'XML::Simple'           => 0
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

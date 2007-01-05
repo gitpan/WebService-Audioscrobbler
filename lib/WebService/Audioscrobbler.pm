@@ -17,7 +17,7 @@ WebService::Audioscrobbler - An object-oriented interface to the Audioscrobbler 
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 CLASS->mk_classaccessor("base_url" => URI->new("http://ws.audioscrobbler.com/1.0/"));
 
@@ -42,7 +42,7 @@ CLASS->mk_accessors(qw/data_fetcher/);
 
 This module aims to be a full implementation of a an object-oriented interface 
 to the Audioscrobbler WebService API (as available on 
-L<http://www.audioscrobbler.net/data/webservices/>). As of version 0.04, the 
+L<http://www.audioscrobbler.net/data/webservices/>). Since version 0.04, the 
 module fully supports data caching and, thus, complies to the service's 
 recommended usage guides.
 
