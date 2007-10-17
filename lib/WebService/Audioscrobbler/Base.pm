@@ -17,7 +17,7 @@ WebService::Audioscrobbler::Base - An object-oriented interface to the Audioscro
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # artists related
 CLASS->mk_classaccessor("artists_postfix"    => "topartists.xml");

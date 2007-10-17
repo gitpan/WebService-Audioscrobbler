@@ -11,7 +11,7 @@ WebService::Audioscrobbler::Artist - An object-oriented interface to the Audiosc
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # postfix related accessors
 CLASS->mk_classaccessor("base_resource_path"  => "artist");

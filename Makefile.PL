@@ -19,7 +19,8 @@ WriteMakefile(
         'UNIVERSAL::require'    => 0,
         'URI'                   => 0,
         'URI::Escape'           => 0,
-        'XML::Simple'           => 0
+        'XML::Simple'           => 0,
+	'NEXT'                  => 0
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'WebService-Audioscrobbler-*' },

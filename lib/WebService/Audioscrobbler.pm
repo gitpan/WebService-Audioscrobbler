@@ -17,7 +17,7 @@ WebService::Audioscrobbler - An object-oriented interface to the Audioscrobbler 
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 CLASS->mk_classaccessor("base_url" => URI->new("http://ws.audioscrobbler.com/1.0/"));
 
