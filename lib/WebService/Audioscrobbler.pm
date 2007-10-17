@@ -17,7 +17,7 @@ WebService::Audioscrobbler - An object-oriented interface to the Audioscrobbler 
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 CLASS->mk_classaccessor("base_url" => URI->new("http://ws.audioscrobbler.com/1.0/"));
 
@@ -57,7 +57,7 @@ recommended usage guides.
     my @tracks = $artist->tracks;
 
     # retrieves tags associated with 'foo'
-    my @tags = #artist->tags;
+    my @tags = $artist->tags;
 
     # fetch artists similar to 'foo'
     my @similar = $artist->similar_artists;
@@ -227,7 +227,7 @@ L<http://search.cpan.org/dist/WebService-Audioscrobbler>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2006 Nilson Santos Figueiredo Júnior, all rights reserved.
+Copyright 2006-2007 Nilson Santos Figueiredo Júnior, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

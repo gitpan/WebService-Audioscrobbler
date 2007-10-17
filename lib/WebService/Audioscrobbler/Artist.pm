@@ -11,7 +11,7 @@ WebService::Audioscrobbler::Artist - An object-oriented interface to the Audiosc
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 # postfix related accessors
 CLASS->mk_classaccessor("base_resource_path"  => "artist");
@@ -57,7 +57,7 @@ Audioscrobbler database.
     my @tracks = $artist->tracks;
 
     # retrieves tags associated with 'foo'
-    my @tags = #artist->tags;
+    my @tags = $artist->tags;
 
 This module inherits from L<WebService::Audioscrobbler::Base>.
 
@@ -224,7 +224,7 @@ Nilson Santos Figueiredo Júnior, C<< <nilsonsfj at cpan.org> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2006 Nilson Santos Figueiredo Júnior, all rights reserved.
+Copyright 2006-2007 Nilson Santos Figueiredo Júnior, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

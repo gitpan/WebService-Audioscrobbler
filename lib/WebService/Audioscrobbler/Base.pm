@@ -17,7 +17,7 @@ WebService::Audioscrobbler::Base - An object-oriented interface to the Audioscro
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 # artists related
 CLASS->mk_classaccessor("artists_postfix"    => "topartists.xml");
@@ -130,20 +130,32 @@ sub tags {
 
     if (ref $data->{tag} eq 'HASH') {
         my $tags = $data->{tag};
-        my $sort_field = $self->tags_sort_field;
-        @tags = map {
-            my $name = $_;
 
-            my $info = $tags->{$name};
-            $info->{name} = $name;
-            $info->{data_fetcher} = $self->data_fetcher;
-
-            $self->tags_class->new($info);
-
-        } sort {$tags->{$b}->{$sort_field} <=> $tags->{$a}->{$sort_field}} keys %$tags;
+        if (exists $tags->{name} && !ref $tags->{name}) {
+            @tags = $self->_process_tag( $tags );
+        }
+        else {
+            my $sort_field = $self->tags_sort_field;
+            @tags = map {
+                $self->_process_tag( $tags->{ $_ }, $_ );
+            } sort {$tags->{$b}->{$sort_field} <=> $tags->{$a}->{$sort_field}} keys %$tags;
+        }
     }
 
     return wantarray ? @tags : \@tags;
+
+}
+
+sub _process_tag {
+    my ($self, $info, $name) = @_;
+    
+    $info->{name} = $name if defined $name;
+
+    die "no tag name" unless defined $info->{name};
+
+    $info->{data_fetcher} = $self->data_fetcher;
+
+    $self->tags_class->new($info);
 
 }
 
@@ -246,7 +258,7 @@ Nilson Santos Figueiredo Júnior, C<< <nilsonsfj at cpan.org> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2006 Nilson Santos Figueiredo Júnior, all rights reserved.
+Copyright 2006-2007 Nilson Santos Figueiredo Júnior, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

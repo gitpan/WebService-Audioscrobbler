@@ -16,7 +16,7 @@ WebService::Audioscrobbler::DataFetcher - Cached data fetching provider
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 # object accessors
 CLASS->mk_accessors(qw/base_url cache_root cache/);
@@ -68,7 +68,7 @@ set as a parameter to C<new()>, setting it afterwards won't have any effect.
 
 =head2 C<new(\%fields)>
 
-Creates a new object using either the given C<$base_yrk> or the C<\%fields> 
+Creates a new object using either the given C<$base_url> or the C<\%fields> 
 hashref. Any of the above fields can be specified. If the C<cache> field is 
 undefined, C<create_cache> will be called after object construction.
 
@@ -189,7 +189,7 @@ Nilson Santos Figueiredo Júnior, C<< <nilsonsfj at cpan.org> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2006 Nilson Santos Figueiredo Júnior, all rights reserved.
+Copyright 2006-2007 Nilson Santos Figueiredo Júnior, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
